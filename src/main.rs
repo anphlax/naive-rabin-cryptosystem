@@ -258,7 +258,7 @@ mod tests {
         let n = &p * &q;
 
         // Define the plaintext and encode it into a number
-        let expected_plaintext = "Recommended website: https://eff.org";
+        let expected_plaintext = "recommended website";
         let plaintext_num = str2num(expected_plaintext, DEFAULT_SYMBOLS)
             .expect("Failed to convert plaintext to number");
 

@@ -12,26 +12,15 @@ pub fn str2num(s: &str, digitstring: &str) -> Option<BigInt> {
     let base = BigInt::from(digitstring.len());
     let mut num = BigInt::zero();
 
-    info!("Encoding string: '{}'", s);
-    info!("Using digitstring: '{}'", digitstring);
-    info!("Base: {}", base);
-
     for (i, c) in s.chars().enumerate() {
         if let Some(pos) = digitstring.find(c) {
-            info!(
-                "Character '{}' at position {} in digitstring: {}",
-                c, i, pos
-            );
             let pos_value = BigInt::from(pos);
             num = num * &base + pos_value;
-            info!("Current number value: {}", num);
         } else {
-            warn!("Invalid character '{}' at position {}", c, i);
+            error!("Invalid character '{}' at position {}", c, i);
             return None;
         }
     }
-
-    info!("Final encoded number: {}", num);
     Some(num)
 }
 
@@ -43,28 +32,28 @@ pub fn num2str(n: &BigInt, digitstring: &str) -> String {
 
     info!("Decoding number: {}", n);
     info!("Using digitstring: '{}'", digitstring);
-    info!("Base: {}", base);
 
     if n.is_zero() {
-        info!("Special case: Input number is 0");
         return digitstring.chars().next().unwrap().to_string();
+    }
+
+    // Handle negative numbers
+    let is_negative = current < BigInt::zero();
+    if is_negative {
+        current = -current;
     }
 
     while current > BigInt::zero() {
         let remainder = (&current % &base).to_usize().unwrap();
-        info!(
-            "Remainder: {}, Corresponding character: '{}'",
-            remainder,
-            digitstring.chars().nth(remainder).unwrap()
-        );
         result.push(digitstring.chars().nth(remainder).unwrap());
         current /= &base;
-        info!("Remaining number: {}", current);
     }
 
-    let decoded_string: String = result.chars().rev().collect();
-    info!("Final decoded string: '{}'", decoded_string);
-    decoded_string
+    if is_negative {
+        result.push('-');
+    }
+
+    result.chars().rev().collect()
 }
 
 
